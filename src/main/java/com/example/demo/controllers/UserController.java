@@ -47,10 +47,10 @@ public class UserController {
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
 		User user = new User();
 		user.setUsername(createUserRequest.getUsername());
-		if(!createUserRequest.getPassword().equals(createUserRequest.getPassword())){
+		if(!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
 			return ResponseEntity.badRequest().build();
 		}
-		user.setPassword(createUserRequest.getPassword());
+		user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
 		Cart cart = new Cart();
 		cartRepository.save(cart);
 		user.setCart(cart);
