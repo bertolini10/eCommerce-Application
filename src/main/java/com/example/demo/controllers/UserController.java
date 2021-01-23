@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import com.example.demo.model.persistence.Cart;
 import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
@@ -22,6 +23,9 @@ import com.example.demo.model.requests.CreateUserRequest;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+
+
+	private Logger logger = LogManager.getLogger(UserController.class);
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -34,20 +38,24 @@ public class UserController {
 
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
+		logger.info("getting-user-by-id: new request");
 		return ResponseEntity.of(userRepository.findById(id));
 	}
 	
 	@GetMapping("/{username}")
 	public ResponseEntity<User> findByUserName(@PathVariable String username) {
+		logger.info("getting-user-by-name: new request");
 		User user = userRepository.findByUsername(username);
 		return user == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
 	}
 	
 	@PostMapping("/create")
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
+		logger.info("create-user: request");
 		User user = new User();
 		user.setUsername(createUserRequest.getUsername());
 		if(!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
+			logger.error("create-user: failed ");
 			return ResponseEntity.badRequest().build();
 		}
 		user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
@@ -55,6 +63,7 @@ public class UserController {
 		cartRepository.save(cart);
 		user.setCart(cart);
 		userRepository.save(user);
+		logger.info("create-user: succeeded");
 		return ResponseEntity.ok(user);
 	}
 	
