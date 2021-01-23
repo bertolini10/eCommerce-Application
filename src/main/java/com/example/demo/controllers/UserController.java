@@ -54,7 +54,7 @@ public class UserController {
 		logger.info("create-user: request");
 		User user = new User();
 		user.setUsername(createUserRequest.getUsername());
-		if(!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
+		if(createUserRequest.getPassword().length()<3 || !createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
 			logger.error("create-user: failed ");
 			return ResponseEntity.badRequest().build();
 		}
